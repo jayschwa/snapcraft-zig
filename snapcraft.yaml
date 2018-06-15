@@ -1,5 +1,6 @@
 name: zig
-version: 0.2.0+git
+version: git
+version-script: zig version
 summary: The Zig Programming Language
 description: Zig is an open-source programming language designed for robustness, optimality, and clarity.
 grade: devel
@@ -30,6 +31,6 @@ parts:
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_PREFIX=/
-    prime:
+    stage:
       - bin/zig
       - lib/zig/*
