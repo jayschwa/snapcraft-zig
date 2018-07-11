@@ -1,7 +1,7 @@
 name: zig
 version: git
 version-script: zig version
-summary: The Zig Programming Language
+summary: Zig Programming Language
 description: Zig is an open-source programming language designed for robustness, optimality, and clarity.
 grade: devel
 confinement: classic
