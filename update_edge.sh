@@ -5,6 +5,8 @@ repo=zig
 branch=master
 snap=zig_git_amd64.snap
 
+cd $(dirname $0)
+
 github_api_url=https://api.github.com/repos/$user/$repo/branches/$branch
 latest_commit=$(curl --silent $github_api_url | jq --raw-output .commit.sha)
 commit_file=${user}_${repo}_${branch}_commit
