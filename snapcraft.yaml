@@ -12,14 +12,14 @@ apps:
 
 parts:
   install-llvm:
-    # Workaround for installing LLVM 6.0 build packages, which do not exist in
-    # the aptitude repositories for Ubuntu 16.04. This can be cleaned up once
+    # Workaround for installing LLVM 7 build packages, which do not exist in
+    # the aptitude repositories for Ubuntu 174. This can be cleaned up once
     # Snapcraft supports custom repositories or an Ubuntu 18.04 base layer.
     plugin: nil
     override-pull: |
       wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-      add-apt-repository -yu "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main"
-      apt install -y libclang-6.0-dev liblld-6.0-dev llvm-6.0-dev
+      add-apt-repository -yu "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
+      apt install -y libclang-7-dev liblld-7-dev llvm-7-dev
   zig:
     after: [install-llvm]
     plugin: cmake
