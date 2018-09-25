@@ -13,7 +13,7 @@ apps:
 parts:
   install-llvm:
     # Workaround for installing LLVM 7 build packages, which do not exist in
-    # the aptitude repositories for Ubuntu 174. This can be cleaned up once
+    # the aptitude repositories for Ubuntu 16.04. This can be cleaned up once
     # Snapcraft supports custom repositories or an Ubuntu 18.04 base layer.
     plugin: nil
     override-pull: |
