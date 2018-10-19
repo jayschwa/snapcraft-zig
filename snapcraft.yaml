@@ -1,6 +1,6 @@
 name: zig
 version: git
-version-script: zig version
+version-script: prime/zig version
 summary: Zig Programming Language
 description: Zig is an open-source programming language designed for robustness, optimality, and clarity.
 grade: devel
@@ -8,29 +8,9 @@ confinement: classic
 
 apps:
   zig:
-    command: bin/zig
+    command: zig
 
 parts:
-  install-llvm:
-    # Workaround for installing LLVM 7 build packages, which do not exist in
-    # the aptitude repositories for Ubuntu 16.04. This can be cleaned up once
-    # Snapcraft supports custom repositories or an Ubuntu 18.04 base layer.
-    plugin: nil
-    override-pull: |
-      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-      add-apt-repository -yu "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
-      apt install -y libclang-7-dev liblld-7-dev llvm-7-dev
   zig:
-    after: [install-llvm]
-    plugin: cmake
-    source: https://github.com/ziglang/zig.git
-    build-packages:
-      - g++
-      - libxml2-dev
-      - zlib1g-dev
-    configflags:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_INSTALL_PREFIX=/
-    stage:
-      - bin/zig
-      - lib/zig/*
+    plugin: dump
+    source: https://ziglang.org/builds/zig-linux-x86_64-master.tar.xz

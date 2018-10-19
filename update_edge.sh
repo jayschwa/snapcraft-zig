@@ -1,23 +1,18 @@
 #!/bin/sh -e
 
-user=ziglang
-repo=zig
-branch=master
 snap=zig_git_amd64.snap
+master=https://ziglang.org/builds/zig-linux-x86_64-master.tar.xz
+current=$(curl --head --silent $master | grep location | awk '{print $2}')
 
 cd $(dirname $0)
 
-github_api_url=https://api.github.com/repos/$user/$repo/branches/$branch
-latest_commit=$(curl --silent $github_api_url | jq --raw-output .commit.sha)
-commit_file=${user}_${repo}_${branch}_commit
-
-if [ "$latest_commit" = "$(cat $commit_file)" ]; then
-	echo "no changes since last build"
+if [ "$current" = "$(cat last_build)" ]; then
+	echo "no change since last build"
 	exit
 fi
 
-git clean --force -x --exclude='*_commit'
+git clean --force -x --exclude='last_build'
 snapcraft cleanbuild
 snapcraft push $snap --release edge
 
-echo $latest_commit > $commit_file
+echo $current > last_build
