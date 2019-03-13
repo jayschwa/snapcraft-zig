@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-snap=zig_git_amd64.snap
+snap=zig.snap
 master=https://ziglang.org/builds/zig-linux-x86_64-master.tar.xz
 current=$(curl --head --silent $master | grep location | awk '{print $2}')
 
@@ -12,7 +12,7 @@ if [ "$current" = "$(cat last_build)" ]; then
 fi
 
 git clean --force -x --exclude='last_build'
-snapcraft cleanbuild
+snapcraft snap --output $snap
 snapcraft push $snap --release edge
 
 echo $current > last_build
