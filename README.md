@@ -21,7 +21,7 @@ Visit https://snapcraft.io/zig to see published versions and more information.
 ## Build a Zig Snap
 
 1. [Setup the `snapcraft` tool][4].
-2. Run `snapcraft cleanbuild` in a copy of this repository.
+2. Run `snapcraft` in a copy of this repository.
 
 [4]: https://docs.snapcraft.io/build-snaps/get-started-snapcraft
 
