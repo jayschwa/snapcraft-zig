@@ -32,5 +32,5 @@ If you have a problem, be sure to report it in the correct place:
 - [Create issues in this project][5] for problems specific to the Zig snap package.
 - For general problems with Zig, head over to the [main Zig project][6].
 
-[5]: https://github.com/jayschwa/zig-snapcraft/issues
+[5]: https://github.com/jayschwa/snapcraft-zig/issues
 [6]: https://github.com/ziglang/zig/issues
