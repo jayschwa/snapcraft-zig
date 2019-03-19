@@ -8,9 +8,11 @@ version=$(basename $location .tar.xz | cut -c18-)
 cd $(dirname $0)
 
 if [ "$version" = "$(cat last_build)" ]; then
-	echo "no change since last build"
+	echo "No change since last build $version"
 	exit
 fi
+
+echo "Building $version"
 
 # Setup working directory
 git clean --force -x --exclude='last_build'
