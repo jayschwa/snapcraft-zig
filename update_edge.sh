@@ -1,7 +1,8 @@
 #!/bin/sh -e
 
 # Prevent concurrent builds
-if [ "$(pgrep --count --full $0)" -gt 1 ]; then
+# Three processes are expected when executed via crontab
+if [ "$(pgrep --count --full $0)" -gt 3 ]; then
 	exit
 fi
 
