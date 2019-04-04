@@ -1,5 +1,10 @@
 #!/bin/sh -e
 
+# Prevent concurrent builds
+if [ "$(pgrep --count --full $0)" -gt 1 ]; then
+	exit
+fi
+
 # Query latest Zig version from URL
 master=https://s3.amazonaws.com/ziglang.org/builds/zig-linux-x86_64-master.tar.xz
 location=$(curl --head --silent $master | grep location | tr -d '\r\n' | awk '{print $2}')
