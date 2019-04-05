@@ -23,8 +23,7 @@ git clean --force -x --exclude=last_build
 sed --in-place "s,source: .*,source: $tarball," snapcraft.yaml
 
 # Build the snap
-export SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=300M
-snapcraft snap --output zig.snap
+snapcraft snap --use-lxd --output zig.snap
 snapcraft push zig.snap --release edge
 
 echo $tarball > last_build
