@@ -1,6 +1,8 @@
-# Zig + Snapcraft
+# Snapcraft 💞 Zig
 
 This repository contains [Snapcraft][1] configuration and script files for packaging [Zig][2] into a [snap][3].
+
+[![Zig](https://snapcraft.io/zig/badge.svg)](https://snapcraft.io/zig)
 
 [1]: https://snapcraft.io
 [2]: https://ziglang.org
