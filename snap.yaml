@@ -1,0 +1,15 @@
+name: zig
+version: $SNAPHACK_PROJECT_VERSION
+summary: Zig Programming Language
+description: Zig is an open-source programming language designed for robustness, optimality,
+  and maintainability.
+apps:
+  zig:
+    command: zig
+architectures:
+- $SNAPHACK_ARCH
+base: bare
+confinement: classic
+grade: devel
+license: MIT
+title: Zig

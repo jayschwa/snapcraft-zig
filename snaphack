@@ -1,0 +1,28 @@
+#!/bin/sh -e
+#
+# Snaphack is a hacky script for creating simple snaps.
+#
+# Usage: snaphack.sh <zig version> <arch> <tarball url>
+#
+# TODO: Check out tar2sqfs once squashfs-tools-ng appears in the package manager.
+
+export SNAPHACK_PROJECT_VERSION=$1
+export SNAPHACK_ARCH=$2
+TARBALL=$3
+SNAP_BUILD=zig_${SNAPHACK_PROJECT_VERSION}_${SNAPHACK_ARCH}
+STAGING_DIR=$(mktemp --directory snaphack-XXXXX)
+echo $STAGING_DIR
+
+# Extract Zig tarball to staging directory.
+curl --silent $TARBALL | tar --extract --one-top-level=$STAGING_DIR --strip-components=1 --xz
+
+# Add metadata.
+mkdir --parents $STAGING_DIR/meta
+envsubst < snap.yaml > $STAGING_DIR/meta/snap.yaml
+
+# Create the snap.
+mksquashfs $STAGING_DIR $SNAP_BUILD.snap -noappend -comp xz -no-xattrs -no-fragments -all-root
+
+rm -rf $STAGING_DIR
+
+echo $SNAP_BUILD.snap
