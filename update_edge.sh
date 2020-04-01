@@ -1,12 +1,12 @@
 #!/bin/sh -e
 
-# Prevent concurrent builds
-# Three processes are expected when executed via crontab
+# Prevent concurrent builds.
+# Three processes are expected when executed via crontab.
 if [ "$(pgrep --count --full $0)" -gt 3 ]; then
 	exit
 fi
 
-# Query latest Zig build
+# Query latest Zig build.
 download_json=$(curl --silent https://ziglang.org/download/index.json)
 version=$(echo $download_json | jq --raw-output '.master.version')
 
@@ -17,13 +17,20 @@ if [ "$version" = "$(cat last_build)" ]; then
 	exit
 fi
 
-# Clean working directory
+# Clean working directory.
 git clean --force -x --exclude=last_build
 
-# Build and upload snap
+# Build and upload AMD64 snap.
 tarball=$(echo $download_json | jq --raw-output '.master."x86_64-linux".tarball')
 echo "Creating snap for $tarball"
 snap=$(./snaphack $version amd64 $tarball | tail -1)
+echo "Uploading $snap"
+snapcraft push $snap --release edge
+
+# Build and upload AArch64 snap.
+tarball=$(echo $download_json | jq --raw-output '.master."aarch64-linux".tarball')
+echo "Creating snap for $tarball"
+snap=$(./snaphack $version arm64 $tarball | tail -1)
 echo "Uploading $snap"
 snapcraft push $snap --release edge
 
