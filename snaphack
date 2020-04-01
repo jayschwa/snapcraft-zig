@@ -8,21 +8,21 @@
 
 export SNAPHACK_PROJECT_VERSION=$1
 export SNAPHACK_ARCH=$2
-TARBALL=$3
-SNAP_BUILD=zig_${SNAPHACK_PROJECT_VERSION}_${SNAPHACK_ARCH}
-STAGING_DIR=$(mktemp --directory snaphack-XXXXX)
-echo $STAGING_DIR
+tarball=$3
+snap_build=zig_${SNAPHACK_PROJECT_VERSION}_${SNAPHACK_ARCH}
+staging_dir=$(mktemp --directory snaphack-XXXXX)
+echo $staging_dir
 
-# Extract Zig tarball to staging directory.
-curl --silent $TARBALL | tar --extract --one-top-level=$STAGING_DIR --strip-components=1 --xz
+# Extract tarball of build to staging directory.
+curl --silent $tarball | tar --extract --one-top-level=$staging_dir --strip-components=1 --xz
 
 # Add metadata.
-mkdir --parents $STAGING_DIR/meta
-envsubst < snap.yaml > $STAGING_DIR/meta/snap.yaml
+mkdir --parents $staging_dir/meta
+envsubst < snap.yaml > $staging_dir/meta/snap.yaml
 
 # Create the snap.
-mksquashfs $STAGING_DIR $SNAP_BUILD.snap -noappend -comp xz -no-xattrs -no-fragments -all-root
+mksquashfs $staging_dir $snap_build.snap -noappend -comp xz -no-xattrs -no-fragments -all-root
 
-rm -rf $STAGING_DIR
+rm -rf $staging_dir
 
-echo $SNAP_BUILD.snap
+echo $snap_build.snap

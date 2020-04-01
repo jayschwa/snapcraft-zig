@@ -7,12 +7,13 @@ if [ "$(pgrep --count --full $0)" -gt 3 ]; then
 fi
 
 # Query latest Zig build
-VERSION=$(curl --silent https://ziglang.org/download/index.json | jq --raw-output '.master.src.tarball' | grep -o '/zig-.*\.tar' | cut -c 6- | rev | cut -c 5- | rev)
+download_json=$(curl --silent https://ziglang.org/download/index.json)
+version=$(echo $download_json | jq --raw-output '.master.version')
 
 cd $(dirname $0)
 
-if [ "$VERSION" = "$(cat last_build)" ]; then
-	echo "No change since last build ($VERSION)"
+if [ "$version" = "$(cat last_build)" ]; then
+	echo "No change since last build ($version)"
 	exit
 fi
 
@@ -20,10 +21,10 @@ fi
 git clean --force -x --exclude=last_build
 
 # Build and upload snap
-TARBALL=$(curl --silent https://ziglang.org/download/index.json | jq --raw-output '.master."x86_64-linux".tarball')
-echo "Creating snap for $TARBALL"
-SNAP=$(./snaphack $VERSION amd64 $TARBALL | tail -1)
-echo "Uploading $SNAP"
-snapcraft push $SNAP --release edge
+tarball=$(echo $download_json | jq --raw-output '.master."x86_64-linux".tarball')
+echo "Creating snap for $tarball"
+snap=$(./snaphack $version amd64 $tarball | tail -1)
+echo "Uploading $snap"
+snapcraft push $snap --release edge
 
-echo $VERSION > last_build
+echo $version > last_build
