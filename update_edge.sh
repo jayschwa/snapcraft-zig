@@ -20,18 +20,16 @@ fi
 # Clean working directory.
 git clean --force -x --exclude=last_build
 
-# Build and upload AMD64 snap.
-tarball=$(echo $download_json | jq --raw-output '.master."x86_64-linux".tarball')
-echo "Creating snap for $tarball"
-snap=$(./snaphack $version amd64 $tarball | tail -1)
-echo "Uploading $snap"
-snapcraft push $snap --release edge
-
-# Build and upload AArch64 snap.
-tarball=$(echo $download_json | jq --raw-output '.master."aarch64-linux".tarball')
-echo "Creating snap for $tarball"
-snap=$(./snaphack $version arm64 $tarball | tail -1)
-echo "Uploading $snap"
-snapcraft push $snap --release edge
+# Build and upload snaps for each architecture
+for pair in "aarch64 arm64" "armv7a armhf" "i386 i386" "x86_64 amd64"; do
+	zig_arch=$(echo $pair | awk '{print $1}')
+	deb_arch=$(echo $pair | awk '{print $2}')
+	tarball=$(echo $download_json | jq --raw-output ".master.\"$zig_arch-linux\".tarball")
+	[ "$tarball" = null ] && continue
+	echo "Creating $deb_arch snap from $tarball"
+	snap=$(./snaphack $version $deb_arch $tarball | tail -1)
+	echo "Uploading $snap"
+	snapcraft push $snap --release edge
+done
 
 echo $version > last_build
