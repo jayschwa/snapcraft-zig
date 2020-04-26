@@ -27,7 +27,7 @@ for pair in "aarch64 arm64" "armv7a armhf" "i386 i386" "x86_64 amd64"; do
 	tarball=$(echo $download_json | jq --raw-output ".master.\"$zig_arch-linux\".tarball")
 	[ "$tarball" = null ] && continue
 	echo "Creating $deb_arch snap from $tarball"
-	snap=$(./snaphack $version $deb_arch $tarball | tail -1)
+	snap=$(./snaphack $version $deb_arch $tarball | grep --only-matching '[[:graph:]]\+\.snap')
 	echo "Uploading $snap"
 	snapcraft push $snap --release edge
 done
