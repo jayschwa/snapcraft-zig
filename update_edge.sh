@@ -29,7 +29,7 @@ for pair in "aarch64 arm64" "armv7a armhf" "i386 i386" "x86_64 amd64"; do
 	echo "Creating $deb_arch snap from $tarball"
 	snap=$(./snaphack $version $deb_arch $tarball | grep --only-matching '[[:graph:]]\+\.snap')
 	echo "Uploading $snap"
-	snapcraft push $snap --release edge
+	snapcraft upload $snap --release edge
 done
 
 echo $version > last_build
