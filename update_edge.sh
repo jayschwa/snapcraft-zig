@@ -11,14 +11,13 @@ fi
 
 cd $(dirname $0)
 
+download_json=$(curl --silent https://ziglang.org/download/index.json)
+
 if [ -n "$version" ]; then
 	zig_release=$version
 else
-	# Query latest Zig build from master branch.
-	download_json=$(curl --silent https://ziglang.org/download/index.json)
 	zig_release=master
 	version=$(echo $download_json | jq --raw-output ".\"$zig_release\".version")
-
 	if [ "$version" = "null" ]; then
 		echo "No master branch info"
 		exit
