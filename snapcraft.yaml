@@ -1,10 +1,12 @@
 name: zig
 title: Zig
 summary: Zig Programming Language
-description: Zig is an open-source programming language designed for robustness, optimality, and maintainability.
+description: Zig is a general-purpose programming language and toolchain for
+  maintaining robust, optimal, and reusable software.
 license: MIT
 
-base: core18
+base: bare
+build-base: core20
 confinement: classic
 grade: devel
 version: master
