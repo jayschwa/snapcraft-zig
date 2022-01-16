@@ -11,7 +11,7 @@ fi
 
 cd $(dirname $0)
 
-download_json=$(curl --silent https://ziglang.org/download/index.json)
+download_json=$(curl --fail --silent https://ziglang.org/download/index.json)
 
 if [ -n "$version" ]; then
 	zig_release=$version
@@ -19,16 +19,18 @@ else
 	zig_release=master
 	version=$(echo $download_json | jq --raw-output ".\"$zig_release\".version")
 	if [ "$version" = "null" ]; then
-		echo "No master branch info"
-		exit
-	elif [ "$version" = "$(cat last_build)" ]; then
-		echo "No change since last build ($version)"
+		echo "Missing master branch info on ziglang.org"
+		exit 1
+	fi
+	snap_version=$(snap info zig | grep latest/edge | awk '{print $2}')
+	if [ "$version" = "$snap_version" ]; then
+		echo "Snap and ziglang.org versions are the same ($version)"
 		exit
 	fi
 fi
 
 # Clean working directory.
-git clean --force -x --exclude=last_build
+git clean --force -x
 
 # Build and upload snaps for each architecture
 for pair in "aarch64 arm64" "armv7a armhf" "i386 i386" "x86_64 amd64"; do
@@ -41,5 +43,3 @@ for pair in "aarch64 arm64" "armv7a armhf" "i386 i386" "x86_64 amd64"; do
 	echo "Uploading $snap"
 	snapcraft upload $snap --release edge
 done
-
-echo $version > last_build
