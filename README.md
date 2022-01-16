@@ -6,7 +6,7 @@ This repository contains [Snapcraft][1] configuration and script files for packa
 
 [1]: https://snapcraft.io
 [2]: https://ziglang.org
-[3]: https://en.wikipedia.org/wiki/Snappy_(package_manager)
+[3]: https://en.wikipedia.org/wiki/Snap_(package_manager)
 
 ## Install Zig
 
@@ -22,17 +22,20 @@ Visit https://snapcraft.io/zig to see published versions and more information.
 
 ## Build a Zig Snap
 
-1. [Setup the `snapcraft` tool][4].
-2. Run `snapcraft` in a copy of this repository.
+Install prerequisites:
 
-[4]: https://docs.snapcraft.io/build-snaps/get-started-snapcraft
+- [`curl`](https://curl.se)
+- [`jq`](https://stedolan.github.io/jq)
+- [`snap` and `snapcraft`](https://snapcraft.io)
+
+Run `zig-to-snap` in this repository.
 
 ## Report Problems
 
 If you have a problem, be sure to report it in the correct place:
 
-- [Create issues in this project][5] for problems specific to the Zig snap package.
-- For general problems with Zig, head over to the [main Zig project][6].
+- [Create issues in this project][4] for problems specific to the Zig snap package.
+- For general problems with Zig, head over to the [main Zig project][5].
 
-[5]: https://github.com/jayschwa/snapcraft-zig/issues
-[6]: https://github.com/ziglang/zig/issues
+[4]: https://github.com/jayschwa/snapcraft-zig/issues
+[5]: https://github.com/ziglang/zig/issues

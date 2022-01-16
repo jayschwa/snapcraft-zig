@@ -1,0 +1,84 @@
+#!/bin/sh -e
+
+fail () {
+	echo "$@" >&2
+	exit 1
+}
+
+if [ "$#" -lt 1 -o "$#" -gt 2 ]; then
+	fail "Usage: $0 <zig version> [snap channel]
+
+Create Snap package(s) of an official Zig release
+and (optionally) upload to the specified channel."
+fi
+
+zig_version=$1
+snap_channel=$2
+
+# Prevent concurrent builds.
+# Three processes are expected when executed via crontab.
+if [ "$(pgrep --count --full $0)" -gt 3 ]; then
+	exit
+fi
+
+zig_download_json=$(
+	curl --fail --silent https://ziglang.org/download/index.json |
+	jq --exit-status ".\"$zig_version\""
+) || fail "No download info for $zig_version on ziglang.org"
+
+zig_version=$(
+	echo $zig_download_json |
+	jq --raw-output ".version // \"$zig_version\""
+)
+
+if [ -n "$snap_channel" ]; then
+	snap_version=$(
+		snap info zig |
+		grep $snap_channel: |
+		awk '{print $2}'
+	)
+	[ -z "$snap_version" ] && fail "Snap channel $snap_channel not found"
+
+	if [ "$snap_version" = "$zig_version" ]; then
+		echo "Snap channel $snap_channel already has Zig $zig_version"
+		exit
+	fi
+fi
+
+package_and_upload () {
+	local zig_tarball_url=$1
+	local snap_arch=$2
+
+	echo "Packaging $zig_tarball_url"
+
+	local staging_dir=$(mktemp --directory)
+
+	# Extract Zig build from tarball.
+	curl --fail --silent $zig_tarball_url | tar --extract --one-top-level=$staging_dir --strip-components=1 --xz
+
+	# Add Snap metadata.
+	mkdir --parents $staging_dir/meta
+	VERSION=$zig_version ARCH=$snap_arch envsubst < snap.yaml > $staging_dir/meta/snap.yaml
+
+	local snap_file=$(
+		snap pack $staging_dir |
+		grep --only-matching '[[:graph:]]\+\.snap'
+	)
+
+	rm -rf $staging_dir
+
+	if [ -n "$snap_channel" ]; then
+		echo "Uploading $snap_file"
+		snapcraft upload $snap_file --release $snap_channel
+	fi
+}
+
+# Package and upload snaps for each architecture. The pair format is (Zig, Snap).
+for arch_pair in "x86_64 amd64" "i386 i386" "aarch64 arm64" "armv7a armhf"; do
+	set -- $arch_pair
+	zig_tarball_url=$(
+		echo $zig_download_json |
+		jq --exit-status --raw-output ".\"$1-linux\".tarball"
+	) || continue
+	package_and_upload $zig_tarball_url $2
+done

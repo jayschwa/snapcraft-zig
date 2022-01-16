@@ -1,5 +1,5 @@
 name: zig
-version: $SNAPHACK_PROJECT_VERSION
+version: $VERSION
 summary: Zig Programming Language
 description: Zig is a general-purpose programming language and toolchain for
   maintaining robust, optimal, and reusable software.
@@ -7,7 +7,7 @@ apps:
   zig:
     command: zig
 architectures:
-- $SNAPHACK_ARCH
+- $ARCH
 base: bare
 confinement: classic
 grade: devel
