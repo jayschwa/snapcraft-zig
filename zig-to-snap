@@ -15,12 +15,6 @@ fi
 zig_version=$1
 snap_channel=$2
 
-# Prevent concurrent builds.
-# Three processes are expected when executed via crontab.
-if [ "$(pgrep --count --full $0)" -gt 3 ]; then
-	exit
-fi
-
 zig_download_json=$(
 	curl --fail --silent https://ziglang.org/download/index.json |
 	jq --exit-status ".\"$zig_version\""

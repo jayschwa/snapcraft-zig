@@ -12,7 +12,7 @@ This repository contains [Snapcraft][1] configuration and script files for packa
 
 To install a recent development version of Zig:
 
-```
+```sh
 snap install zig --classic --edge
 ```
 
@@ -29,6 +29,32 @@ Install prerequisites:
 - [`snap` and `snapcraft`](https://snapcraft.io)
 
 Run `zig-to-snap` in this repository.
+
+## Background Service
+
+Start:
+
+```sh
+systemd-run --user --unit=zig-to-snap --on-startup=0 --on-unit-inactive=5min $PWD/zig-to-snap master latest/edge
+```
+
+Stop:
+
+```sh
+systemctl stop --user zig-to-snap.timer
+```
+
+Status:
+
+```sh
+systemctl status --user zig-to-snap.service
+```
+
+Log:
+
+```sh
+journalctl --user --unit=zig-to-snap.service
+```
 
 ## Report Problems
 
