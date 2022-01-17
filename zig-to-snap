@@ -80,5 +80,7 @@ for arch_pair in "x86_64 amd64" "i386 i386" "aarch64 arm64" "armv7a armhf"; do
 		echo $zig_download_json |
 		jq --exit-status --raw-output ".\"$1-linux\".tarball"
 	) || continue
-	package_and_upload $zig_tarball_url $2
+	package_and_upload $zig_tarball_url $2 &
 done
+
+wait
