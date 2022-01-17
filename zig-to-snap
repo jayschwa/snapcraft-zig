@@ -59,11 +59,11 @@ package_and_upload () {
 		grep --only-matching '[[:graph:]]\+\.snap'
 	)
 
-	rm -rf $staging_dir
+	rm --recursive $staging_dir
 
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
-		snapcraft upload $snap_file --release $snap_channel
+		snapcraft upload $snap_file --release $snap_channel && rm $snap_file
 	fi
 }
 
