@@ -35,7 +35,7 @@ Run `zig-to-snap` in this repository.
 Start:
 
 ```sh
-systemd-run --user --unit=zig-to-snap --on-startup=0 --on-unit-inactive=5min $PWD/zig-to-snap master latest/edge
+systemd-run --user --unit=zig-to-snap --on-startup=0 --on-unit-inactive=5min $PWD/zig-to-snap master edge
 ```
 
 Stop:
@@ -53,7 +53,7 @@ systemctl status --user zig-to-snap.service
 Log:
 
 ```sh
-journalctl --user --unit=zig-to-snap.service
+journalctl --user-unit zig-to-snap.service
 ```
 
 ## Report Problems
