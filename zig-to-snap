@@ -63,7 +63,9 @@ package_and_upload () {
 
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
-		snapcraft upload $snap_file --release $snap_channel && rm $snap_file
+		snapcraft upload $snap_file --release $snap_channel ||
+			fail "Failed to upload $snap_file"
+		rm $snap_file
 	fi
 }
 
@@ -75,6 +77,7 @@ for arch_pair in "x86_64 amd64" "i386 i386" "aarch64 arm64" "armv7a armhf"; do
 		jq --exit-status --raw-output ".\"$1-linux\".tarball"
 	) || continue
 	package_and_upload $zig_tarball_url $2 &
+	pids="$! $pids"
 done
 
-wait
+wait $pids
