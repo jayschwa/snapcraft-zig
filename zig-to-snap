@@ -12,6 +12,7 @@ Create Snap package(s) of an official Zig release
 and (optionally) upload to the specified channel."
 fi
 
+script_dir=$(dirname $0)
 zig_version=$1
 snap_channel=$2
 
@@ -46,20 +47,19 @@ package_and_upload () {
 	echo "Packaging $zig_tarball_url"
 
 	local staging_dir=$(mktemp --directory)
+	trap "rm --recursive $staging_dir" EXIT
 
 	# Extract Zig build from tarball.
 	curl --fail --silent $zig_tarball_url | tar --extract --one-top-level=$staging_dir --strip-components=1 --xz
 
 	# Add Snap metadata.
 	mkdir --parents $staging_dir/meta
-	VERSION=$zig_version ARCH=$snap_arch envsubst < snap.yaml > $staging_dir/meta/snap.yaml
+	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $staging_dir/meta/snap.yaml
 
 	local snap_file=$(
 		snap pack $staging_dir |
 		grep --only-matching '[[:graph:]]\+\.snap'
 	)
-
-	rm --recursive $staging_dir
 
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
