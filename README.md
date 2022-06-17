@@ -35,7 +35,7 @@ Run `zig-to-snap` in this repository.
 Start:
 
 ```sh
-systemd-run --user --unit=zig-to-snap --on-startup=0 --on-unit-inactive=5min $PWD/zig-to-snap master edge
+systemd-run --user --unit=zig-to-snap --on-startup=0 --on-unit-inactive=5min --setenv=SNAPCRAFT_STORE_CREDENTIALS=hunter2 $PWD/zig-to-snap master edge
 ```
 
 Stop:
