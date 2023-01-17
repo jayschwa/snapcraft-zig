@@ -1,8 +1,10 @@
 name: zig
+title: Zig
 version: $VERSION
 summary: Zig Programming Language
 description: Zig is a general-purpose programming language and toolchain for
   maintaining robust, optimal, and reusable software.
+license: MIT
 apps:
   zig:
     command: zig
@@ -11,5 +13,3 @@ architectures:
 base: bare
 confinement: classic
 grade: devel
-license: MIT
-title: Zig
