@@ -63,7 +63,7 @@ package_and_upload () {
 
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
-		snapcraft upload $snap_file --release $snap_channel ||
+		snapcraft upload $snap_file --release $snap_channel --quiet ||
 			fail "Failed to upload $snap_file"
 		rm $snap_file
 	fi
