@@ -78,6 +78,8 @@ for arch_pair in \
 	"i386 i386" \
 	"aarch64 arm64" \
 	"armv7a armhf" \
+	"riscv64 riscv64" \
+	"powerpc64le ppc64el" \
 ; do
 	set -- $arch_pair
 	zig_tarball_url=$(
