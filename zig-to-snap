@@ -41,16 +41,16 @@ if [ -n "$snap_channel" ]; then
 fi
 
 package_and_upload () {
-	local zig_tarball_url=$1
+	local zig_archive_url=$1
 	local snap_arch=$2
 
-	echo "Packaging $zig_tarball_url"
+	echo "Packaging $zig_archive_url"
 
 	local staging_dir=$(mktemp --directory)
 	trap "rm --recursive $staging_dir" EXIT
 
-	# Extract Zig build from tarball.
-	curl --fail --silent $zig_tarball_url | tar --extract --one-top-level=$staging_dir --strip-components=1 --xz
+	# Extract Zig build from archive.
+	curl --fail --silent $zig_archive_url | tar --extract --xz --strip-components=1 --one-top-level=$staging_dir
 
 	# Add Snap metadata.
 	mkdir --parents $staging_dir/meta
@@ -82,11 +82,11 @@ for arch_pair in \
 	"powerpc64le ppc64el" \
 ; do
 	set -- $arch_pair
-	zig_tarball_url=$(
+	zig_archive_url=$(
 		echo $zig_download_json |
 		jq --exit-status --raw-output ".\"$1-linux\".tarball"
 	) || continue
-	package_and_upload $zig_tarball_url $2 &
+	package_and_upload $zig_archive_url $2 &
 	pids="$! $pids"
 done
 
