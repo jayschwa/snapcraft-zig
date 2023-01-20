@@ -46,18 +46,23 @@ package_and_upload () {
 
 	echo "Packaging $zig_archive_url"
 
-	local staging_dir=$(mktemp --directory)
-	trap "rm --recursive $staging_dir" EXIT
+	local dir=$(mktemp --directory)
+	trap "rm --recursive $dir" EXIT
 
-	# Extract Zig build from archive.
-	curl --fail --silent $zig_archive_url | tar --extract --xz --strip-components=1 --one-top-level=$staging_dir
+	# Download Zig archive and signature.
+	curl --fail --silent $zig_archive_url > $dir/archive
+	curl --fail --silent $zig_archive_url.minisig > $dir/archive.minisig
+
+	# Verify and extract archive to staging directory.
+	local pubkey="RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U"
+	minisign -V -P $pubkey -o -m $dir/archive | tar --extract --xz --strip-components=1 --one-top-level=$dir/staging
 
 	# Add Snap metadata.
-	mkdir --parents $staging_dir/meta
-	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $staging_dir/meta/snap.yaml
+	mkdir --parents $dir/staging/meta
+	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $dir/staging/meta/snap.yaml
 
 	local snap_file=$(
-		snap pack $staging_dir |
+		snap pack $dir/staging |
 		grep --only-matching '[[:graph:]]\+\.snap'
 	)
 
