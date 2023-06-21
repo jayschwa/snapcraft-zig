@@ -38,6 +38,8 @@ if [ -n "$snap_channel" ]; then
 		echo "Snap channel $snap_channel already has Zig $zig_version"
 		exit
 	fi
+
+	snapcraft whoami --quiet || fail "Snapcraft is not logged in"
 fi
 
 package_and_upload () {
