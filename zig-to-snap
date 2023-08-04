@@ -72,12 +72,9 @@ package_and_upload () {
 }
 
 # Package and upload snaps for each architecture. The pair format is (Zig, Snap).
-# NOTE: Zig uses "x86" for version 0.11-dev and "i386" for version 0.10 and older.
-# TODO: Remove "i386" Zig arch after version 0.11 is released.
 for arch_pair in \
 	"x86_64 amd64" \
 	"x86 i386" \
-	"i386 i386" \
 	"aarch64 arm64" \
 	"armv7a armhf" \
 	"riscv64 riscv64" \
