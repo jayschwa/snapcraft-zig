@@ -10,10 +10,10 @@ This repository contains [Snapcraft][1] configuration and script files for packa
 
 ## Install Zig
 
-To install a recent development version of Zig:
+To install the latest tagged version of Zig:
 
 ```sh
-snap install zig --classic --edge
+snap install zig --classic --beta
 ```
 
 Since Zig is undergoing rapid development, stable versions have not been published yet.
