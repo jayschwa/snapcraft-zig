@@ -48,18 +48,23 @@ package_and_upload () {
 
 	echo "Packaging $zig_archive_url"
 
-	local staging_dir=$(mktemp --directory)
-	trap "rm --recursive $staging_dir" EXIT
+	local work_dir=$(mktemp --directory)
+	trap "rm --recursive $work_dir" EXIT
 
-	# Extract Zig build from archive.
-	curl --fail --silent $zig_archive_url | tar --extract --xz --strip-components=1 --one-top-level=$staging_dir
+	# Download Zig archive and signature.
+	curl --fail --silent $zig_archive_url > $work_dir/archive
+	curl --fail --silent $zig_archive_url.minisig > $work_dir/archive.minisig
+
+	# Verify and extract archive to staging directory.
+	minisign -V -p $script_dir/minisign.pub -m $work_dir/archive -o |
+	tar --extract --xz --strip-components=1 --one-top-level=$work_dir/staging
 
 	# Add Snap metadata.
-	mkdir --parents $staging_dir/meta
-	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $staging_dir/meta/snap.yaml
+	mkdir --parents $work_dir/staging/meta
+	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $work_dir/staging/meta/snap.yaml
 
 	local snap_file=$(
-		snap pack $staging_dir |
+		snap pack $work_dir/staging |
 		grep --only-matching '[[:graph:]]\+\.snap'
 	)
 
@@ -68,6 +73,8 @@ package_and_upload () {
 		snapcraft upload $snap_file --release $snap_channel --quiet ||
 			fail "Failed to upload $snap_file"
 		rm $snap_file
+	else
+		echo "Created $snap_file"
 	fi
 }
 

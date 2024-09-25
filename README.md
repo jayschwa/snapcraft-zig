@@ -26,6 +26,7 @@ Install prerequisites:
 
 - [`curl`](https://curl.se)
 - [`jq`](https://stedolan.github.io/jq)
+- [`minisign`](https://jedisct1.github.io/minisign)
 - [`snap` and `snapcraft`](https://snapcraft.io)
 
 Run `zig-to-snap` in this repository.
