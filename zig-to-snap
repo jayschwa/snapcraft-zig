@@ -19,7 +19,7 @@ snap_channel=$2
 zig_download_json=$(
 	curl --fail --silent https://ziglang.org/download/index.json |
 	jq --exit-status ".\"$zig_version\""
-) || fail "No download info for $zig_version on ziglang.org"
+) || fail "Missing info for $zig_version on https://ziglang.org"
 
 zig_version=$(
 	echo $zig_download_json |
@@ -52,12 +52,15 @@ package_and_upload () {
 	trap "rm --recursive $work_dir" EXIT
 
 	# Download Zig archive and signature.
-	curl --fail --silent $zig_archive_url > $work_dir/archive
-	curl --fail --silent $zig_archive_url.minisig > $work_dir/archive.minisig
+	curl --fail --silent $zig_archive_url > $work_dir/archive ||
+		fail "Download failed: $zig_archive_url"
+	curl --fail --silent $zig_archive_url.minisig > $work_dir/archive.minisig ||
+		fail "Download failed: $zig_archive_url.minisig"
 
 	# Verify and extract archive to staging directory.
 	minisign -V -p $script_dir/minisign.pub -m $work_dir/archive -o |
-	tar --extract --xz --strip-components=1 --one-top-level=$work_dir/staging
+	tar --extract --xz --strip-components=1 --one-top-level=$work_dir/staging ||
+		fail "Archive is corrupt: $zig_archive_url"
 
 	# Add Snap metadata.
 	mkdir --parents $work_dir/staging/meta
@@ -71,7 +74,7 @@ package_and_upload () {
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
 		snapcraft upload $snap_file --release $snap_channel --quiet ||
-			fail "Failed to upload $snap_file"
+			fail "Upload failed: $snap_file"
 		rm $snap_file
 	else
 		echo "Created $snap_file"
