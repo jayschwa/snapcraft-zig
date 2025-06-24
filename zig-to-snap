@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 fail () {
 	echo "$@" >&2
@@ -88,6 +88,7 @@ package_and_upload () {
 # Package and upload snaps for each architecture. The pair format is (Zig, Snap).
 # Zig's architectures can be found by running the command `zig targets | jq .arch`.
 # Snap's architectures can be found at https://github.com/snapcore/snapd/blob/master/arch/arch.go.
+trap 'kill $(jobs -p) &>/dev/null; wait; exit 130' INT TERM
 for arch_pair in \
 	"x86 i386" \
 	"x86_64 amd64" \
@@ -105,7 +106,5 @@ for arch_pair in \
 		jq --exit-status --raw-output ".\"$1-linux\".tarball"
 	) || continue
 	package_and_upload $zig_archive_url $2 &
-	pids="$! $pids"
 done
-
-wait $pids
+wait
