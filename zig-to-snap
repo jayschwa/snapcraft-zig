@@ -73,8 +73,12 @@ package_and_upload () {
 
 	if [ -n "$snap_channel" ]; then
 		echo "Uploading $snap_file"
-		snapcraft upload $snap_file --release $snap_channel --quiet ||
-			fail "Upload failed: $snap_file"
+		if ! snapcraft upload $snap_file --release $snap_channel --quiet; then
+			echo "First upload attempt failed, waiting a moment before retrying..."
+			sleep 60
+			snapcraft upload $snap_file --release $snap_channel --quiet ||
+				fail "Upload failed after multiple attempts: $snap_file"
+		fi
 		rm $snap_file
 	else
 		echo "Created $snap_file"
