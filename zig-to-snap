@@ -48,7 +48,7 @@ package_and_upload () {
 
 	echo "Packaging $zig_archive_url"
 
-	local work_dir=$(mktemp --directory)
+	local work_dir=$(mktemp --tmpdir --directory zig-to-snap-XXXXXX)
 	trap "rm --recursive $work_dir" EXIT
 
 	# Download Zig archive and signature.
