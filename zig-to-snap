@@ -15,9 +15,10 @@ fi
 script_dir=$(dirname $0)
 zig_version=$1
 snap_channel=$2
+source='?source=jayschwa-snapcraft-zig'
 
 zig_download_json=$(
-	curl --fail --silent https://ziglang.org/download/index.json |
+	curl --fail --silent https://ziglang.org/download/index.json$source |
 	jq --exit-status ".\"$zig_version\""
 ) || fail "Missing info for $zig_version on https://ziglang.org"
 
@@ -52,9 +53,9 @@ package_and_upload () {
 	trap "rm --recursive $work_dir" EXIT
 
 	# Download Zig archive and signature.
-	curl --fail --silent $zig_archive_url > $work_dir/archive ||
+	curl --fail --silent $zig_archive_url$source > $work_dir/archive ||
 		fail "Download failed: $zig_archive_url"
-	curl --fail --silent $zig_archive_url.minisig > $work_dir/archive.minisig ||
+	curl --fail --silent $zig_archive_url.minisig$source > $work_dir/archive.minisig ||
 		fail "Download failed: $zig_archive_url.minisig"
 
 	# Verify and extract archive to staging directory.
