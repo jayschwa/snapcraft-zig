@@ -17,6 +17,9 @@ zig_version=$1
 snap_channel=$2
 source='?source=jayschwa-snapcraft-zig'
 
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/snapcraft-zig
+mkdir --parents $cache_dir
+
 zig_download_json=$(
 	curl --fail --silent https://ziglang.org/download/index.json$source |
 	jq --exit-status ".\"$zig_version\""
@@ -43,25 +46,41 @@ if [ -n "$snap_channel" ]; then
 	snapcraft whoami --quiet || fail "Snapcraft is not logged in"
 fi
 
+mirrors=$(
+	curl --fail --silent https://ziglang.org/download/community-mirrors.txt$source
+) || fail "Failed to fetch list of community mirrors"
+
 package_and_upload () {
 	local zig_archive_url=$1
 	local snap_arch=$2
+	local archive_name=${zig_archive_url#https://ziglang.org/builds/}
 
-	echo "Packaging $zig_archive_url"
+	echo "Packaging $archive_name"
 
 	local work_dir=$(mktemp --tmpdir --directory zig-to-snap-XXXXXX)
 	trap "rm --recursive $work_dir" EXIT
 
-	# Download Zig archive and signature.
-	curl --fail --silent $zig_archive_url$source > $work_dir/archive ||
-		fail "Download failed: $zig_archive_url"
-	curl --fail --silent $zig_archive_url.minisig$source > $work_dir/archive.minisig ||
-		fail "Download failed: $zig_archive_url.minisig"
+	# Build list of mirror URLs.
+	local mirrored_archive_urls=$(echo "$mirrors" | awk -v path="/${archive_name}$source" '{print $0 path}')
+	local mirrored_minisig_urls=$(echo "$mirrors" | awk -v path="/${archive_name}.minisig$source" '{print $0 path}')
+
+	# This file enables aria2 to track server performance across downloads.
+	local server_stats=$cache_dir/aria2-server-stats
+
+	# Download Zig archive and signature from mirrors.
+	aria2c --quiet --dir=$work_dir --out=archive \
+		--server-stat-if=$server_stats --server-stat-of=$server_stats \
+		$mirrored_archive_urls $zig_archive_url$source ||
+			fail "Download failed: $archive_name"	
+	aria2c --quiet --dir=$work_dir --out=archive.minisig \
+		--server-stat-if=$server_stats --server-stat-of=$server_stats \
+		$mirrored_minisig_urls $zig_archive_url.minisig$source ||
+			fail "Download failed: $archive_name.minisig"
 
 	# Verify and extract archive to staging directory.
 	minisign -V -p $script_dir/minisign.pub -m $work_dir/archive -o |
 	tar --extract --xz --strip-components=1 --one-top-level=$work_dir/staging ||
-		fail "Archive is corrupt: $zig_archive_url"
+		fail "Archive is corrupt: $archive_name"
 
 	# Add Snap metadata.
 	mkdir --parents $work_dir/staging/meta

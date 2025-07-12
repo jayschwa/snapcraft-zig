@@ -24,6 +24,7 @@ Visit https://snapcraft.io/zig to see published versions and more information.
 
 Install prerequisites:
 
+- [`aria2c`](https://aria2.github.io)
 - [`curl`](https://curl.se)
 - [`jq`](https://stedolan.github.io/jq)
 - [`minisign`](https://jedisct1.github.io/minisign)
