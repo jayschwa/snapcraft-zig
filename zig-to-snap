@@ -20,15 +20,14 @@ source='?source=jayschwa-snapcraft-zig'
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/snapcraft-zig
 mkdir --parents $cache_dir
 
-zig_download_json=$(
-	curl --fail --silent https://ziglang.org/download/index.json$source |
-	jq --exit-status ".\"$zig_version\""
-) || fail "Missing info for $zig_version on https://ziglang.org"
+aria2c --quiet --dir=$cache_dir \
+	--conditional-get --allow-overwrite --remote-time \
+	https://ziglang.org/download/index.json$source ||
+		fail "Download failed: https://ziglang.org/download/index.json"
 
-zig_version=$(
-	echo $zig_download_json |
-	jq --raw-output ".version // \"$zig_version\""
-)
+zig_download_json=$(jq --exit-status ".\"$zig_version\"" $cache_dir/index.json) ||
+	fail "Missing info for $zig_version on https://ziglang.org"
+zig_version=$(echo $zig_download_json | jq --raw-output ".version // \"$zig_version\"")
 
 if [ -n "$snap_channel" ]; then
 	snap_version=$(
@@ -46,9 +45,11 @@ if [ -n "$snap_channel" ]; then
 	snapcraft whoami --quiet || fail "Snapcraft is not logged in"
 fi
 
-mirrors=$(
-	curl --fail --silent https://ziglang.org/download/community-mirrors.txt$source
-) || fail "Failed to fetch list of community mirrors"
+# Download and cache optional list of community mirrors.
+aria2c --quiet --dir=$cache_dir \
+	--conditional-get --allow-overwrite --remote-time \
+	https://ziglang.org/download/community-mirrors.txt$source || true
+mirrors_list=$cache_dir/community-mirrors.txt
 
 package_and_upload () {
 	local zig_archive_url=$1
@@ -60,9 +61,11 @@ package_and_upload () {
 	local work_dir=$(mktemp --tmpdir --directory zig-to-snap-XXXXXX)
 	trap "rm --recursive $work_dir" EXIT
 
-	# Build list of mirror URLs.
-	local mirrored_archive_urls=$(echo "$mirrors" | awk -v path="/${archive_name}$source" '{print $0 path}')
-	local mirrored_minisig_urls=$(echo "$mirrors" | awk -v path="/${archive_name}.minisig$source" '{print $0 path}')
+	# Build list of mirrored file URLs.
+	if [ -s $mirrors_list ]; then
+		local mirrored_archive_urls=$(cat $mirrors_list | awk -v path="/${archive_name}$source" '{print $0 path}')
+		local mirrored_minisig_urls=$(cat $mirrors_list | awk -v path="/${archive_name}.minisig$source" '{print $0 path}')
+	fi
 
 	# This file enables aria2 to track server performance across downloads.
 	local server_stats=$cache_dir/aria2-server-stats
