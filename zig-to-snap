@@ -54,12 +54,12 @@ mirrors_list=$cache_dir/community-mirrors.txt
 package_and_upload () {
 	local zig_archive_url=$1
 	local snap_arch=$2
-	local archive_name=${zig_archive_url#https://ziglang.org/builds/}
+	local archive_name=$(basename $zig_archive_url)
 
 	echo "Packaging $archive_name"
 
 	local work_dir=$(mktemp --tmpdir --directory zig-to-snap-XXXXXX)
-	trap "rm --recursive $work_dir" EXIT
+	trap "rm --force --recursive $work_dir" EXIT
 
 	# Build list of mirrored file URLs.
 	if [ -s $mirrors_list ]; then
