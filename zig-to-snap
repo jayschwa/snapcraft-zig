@@ -115,7 +115,7 @@ trap 'kill $(jobs -p) &>/dev/null; wait; exit 130' INT TERM
 for arch_pair in \
 	"x86 i386" \
 	"x86_64 amd64" \
-	"armv7a armhf" \
+	"arm armhf" \
 	"aarch64 arm64" \
 	"powerpc powerpc" \
 	"powerpc64 ppc64" \
