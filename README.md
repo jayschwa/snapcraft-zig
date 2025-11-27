@@ -65,4 +65,4 @@ If you have a problem, be sure to report it in the correct place:
 - For general problems with Zig, head over to the [main Zig project][5].
 
 [4]: https://github.com/jayschwa/snapcraft-zig/issues
-[5]: https://github.com/ziglang/zig/issues
+[5]: https://codeberg.org/ziglang/zig/issues
