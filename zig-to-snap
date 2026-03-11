@@ -85,6 +85,9 @@ package_and_upload () {
 	tar --extract --xz --strip-components=1 --one-top-level=$work_dir/staging ||
 		fail "Archive is corrupt: $archive_name"
 
+	# Use the Zig executable's modification time as the source date epoch for reproducible builds.
+	export SOURCE_DATE_EPOCH=$(stat --format=%Y $work_dir/staging/zig)
+
 	# Add Snap metadata.
 	mkdir --parents $work_dir/staging/meta
 	VERSION=$zig_version ARCH=$snap_arch envsubst < $script_dir/snap.yaml > $work_dir/staging/meta/snap.yaml
